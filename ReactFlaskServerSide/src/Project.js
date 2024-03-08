@@ -18,7 +18,7 @@ const Project = ({ name, hwSet1, hwSet2, onJoinLeave }) => {
             {name}
           </Typography>
           <Typography color="text.secondary">
-            list, of, authorized, users
+            list of authorized users
           </Typography>
         </Box>
 

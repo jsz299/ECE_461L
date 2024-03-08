@@ -1,26 +1,69 @@
 import './Home.css';
-import { Container, TextField, Button, Typography, Grid } from "@mui/material";
+import { Container, TextField, Button, Typography, Grid, Snackbar } from "@mui/material";
 import React, { useState } from "react";
+import {useNavigate} from "react-router-dom";
 
 
 function Home() {
-// Initialize state
+    // Used for navigating across different views/pages
+    const navigate = useNavigate()
+    // Initialize state of snackbar ~ material ui component that creates a pop-up
+    const [open, setOpen] = useState(false);
+
+    // Initialize state of text fields
+    const [loginUsername, setLoginUsername] = useState('');
     const [loginUserID, setLoginUserID] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
     const [username, setUsername] = useState('');
     const [userID, setUserID] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        // Login logic here
-    };
-
 
     // Handlers for updating the state based on user input
     const handleUsernameChange = (e) => setUsername(e.target.value);
     const handleUserIDChange = (e) => setUserID(e.target.value);
     const handlePasswordChange = (e) => setPassword(e.target.value);
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
+    };
+
+
+    //Handler for pressing login
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        // Combine user input into a single object
+        const userInfo = {
+            loginUsername,
+            loginUserID,
+            loginPassword,
+        };
+
+        // Send the information to the Flask API
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userInfo),
+        });
+
+        // Stores the json response from API
+        const data = await response.json();
+
+        // Checks if user credentials are legit
+        if(data.authentication == true){
+            navigate('/projects') // Route defined in index.js
+        }
+        else{
+            setOpen(true);
+        }
+    };
+
 
     // Handler for pressing submit
     const handleSubmit = async (e) => {
@@ -53,6 +96,12 @@ function Home() {
                 <Grid item xs={12} md={6}>
                     <Typography variant="h5" gutterBottom>Login</Typography>
                     <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <TextField
+                            label="Username"
+                            variant="outlined"
+                            value={loginUsername}
+                            onChange={(e) => setLoginUsername(e.target.value)}
+                        />
                         <TextField
                             label="User ID"
                             variant="outlined"
@@ -95,6 +144,13 @@ function Home() {
                     </form>
                 </Grid>
             </Grid>
+             {/* Snackbar for showing the login error message */}
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                message="Wrong Credentials. Please try again."
+            />
         </Container>
     );
 }

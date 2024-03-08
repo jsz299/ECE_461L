@@ -32,6 +32,24 @@ def createAccount():
     return 'Done', 201  # postman to check route integrity
 
 
+@app.route("/login", methods=["POST"])
+def login():
+    userInfo = request.get_json()
+
+    userID = userInfo['loginUserID']  # get the information from the key userID:
+    password = userInfo['loginPassword']  # get the information from the key password:
+    username = userInfo['loginUsername']  # get the information from the key username:
+
+    userID = cipher.encrypt(userID, 3, 2)  # encrypt the userID
+    password = cipher.encrypt(password, 4, 2)  # encrypt the password
+
+    authentication = database.authenticateLogin(username, userID, password)
+    # print(authentication)
+    # Must return a valid type: string, dict, list, tuple with headers or status, Response instance, or WSGI callable
+    return jsonify({"authentication": authentication})
+
+
+
 @app.route("/projectview", methods=["GET"])
 def projectView():
     # Fetch project data from your database or another source

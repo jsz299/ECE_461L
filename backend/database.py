@@ -24,7 +24,7 @@ def createUser(username, encryptedUserID, encrypyedPassword):
 # Function to determine if username exists or not in the database 
 def getUser(username):
     db = client.get_database("UserLoginCredentials")
-    ListOfCollections = db.list_collection_names 
+    ListOfCollections = db.list_collection_names()
     if username in ListOfCollections:
         return True
     else:
