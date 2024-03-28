@@ -56,10 +56,10 @@ function Home() {
         const data = await response.json();
 
         // Checks if user credentials are legit
-        if(data.authentication == true){
-            navigate('/projects') // Route defined in index.js
-        }
-        else{
+        if(data.authentication === true){
+            localStorage.setItem('username', loginUsername);
+            navigate('/projects'); // Route defined in index.js
+        } else {
             setOpen(true);
         }
     };

@@ -49,12 +49,51 @@ def login():
     return jsonify({"authentication": authentication})
 
 
+@app.route('/checkin_hardware/<projectId>/<int:qty>', methods=['POST'])
+def checkIn_hardware(projectId, qty):
+    # Logic to interact with the database would go here
+    # For now, we are just returning the projectId and quantity
+    return jsonify({"message": f"{qty} hardware checked in for project {projectId}"}), 200
 
-@app.route("/projectview", methods=["GET"])
-def projectView():
-    # Fetch project data from your database or another source
-    # For example purposes, just returning a static response
-    return jsonify({"message": "Project data here"}), 200
+
+@app.route('/checkout_hardware/<projectId>/<int:qty>', methods=['POST'])
+def checkOut_hardware(projectId, qty):
+    # Logic to interact with the database would go here
+    # For now, we are just returning the projectId and quantity
+    return jsonify({"message": f"{qty} hardware checked out for project {projectId}"}), 200
+
+
+@app.route('/api/projects/<username>', methods=['GET'])
+def getProjects(username):
+    projects = database.getUserProjects(username)
+    return jsonify({"projects": projects})
+
+
+@app.route('/create_project', methods=['POST'])
+def createProject():
+    newProjectInfo = request.get_json()  # parse incoming json request data and return it
+
+    projectName = newProjectInfo['name']  # get the name of the project
+    description = newProjectInfo['description']  # get the info about the project
+    projectID = newProjectInfo['projectID']  # get the project id
+    username = newProjectInfo['username']  # get the project id
+
+    database.createProjectDB(projectName, description, projectID, username)  #call db function
+    return jsonify({"message": f"created"}), 200
+
+
+@app.route('/join_project', methods=['POST'])
+def joinProject():
+    # Logic to verify user authorization would go here
+    # For now, we are just returning the projectId
+    return jsonify({"message": f"Joined project "}), 200
+
+
+@app.route('/leave_project', methods=['POST'])
+def leaveProject():
+    # Logic to verify if user is part of the project would go here
+    # For now, we are just returning the projectId
+    return jsonify({"message": f"Left project"}), 200
 
 
 if __name__ == '__main__':

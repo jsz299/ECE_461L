@@ -16,7 +16,7 @@ def createUser(username, encryptedUserID, encrypyedPassword):
     userDocument = {
         "userID": encryptedUserID,
         "password": encrypyedPassword,
-        "datecreated": datetime.now(),
+        "dateCreated": datetime.now(),
     }    
     collection.insert_one(userDocument)
 
@@ -43,5 +43,32 @@ def authenticateLogin(username, encryptedUserID, encryptedPassword):
         return True
 
     return False
-        
-    
+
+
+def createProjectDB(projectName, description, projectID, username):
+    db = client.get_database("Projects")
+    collection = db[projectName]
+    projectDocument = {
+        "projectID": projectID,
+        "description": description,
+        "dateCreated": datetime.now(),
+        "members": [username]
+    }
+    collection.insert_one(projectDocument)
+
+
+def getUserProjects(username):
+    db = client.get_database("Projects")
+    user_projects = []
+    for collection_name in db.list_collection_names():
+        collection = db.get_collection(collection_name)
+        project = collection.find_one({"members": username})
+        if project:
+            user_projects.append({
+                "projectName": collection_name,
+                "projectID": project.get("projectID", ""),
+                "description": project.get("description", ""),
+                "members": project.get("members", "")
+            })
+    return user_projects
+

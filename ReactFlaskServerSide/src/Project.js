@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Button, Typography, Box } from '@mui/material';
 
-const Project = ({ name, hwSet1, hwSet2, onJoinLeave }) => {
+const Project = ({ name, members, hwSet1, hwSet2, onJoinLeave }) => {
   const [joined, setJoined] = useState(false);
+
 
   const handleJoinLeave = () => {
     setJoined(!joined);
@@ -17,9 +18,12 @@ const Project = ({ name, hwSet1, hwSet2, onJoinLeave }) => {
           <Typography variant="h5" component="div">
             {name}
           </Typography>
-          <Typography color="text.secondary">
-            list of authorized users
-          </Typography>
+          {/* Map over the members array to list each member */}
+          {members.map((member, index) => (
+            <Typography key={index} color="text.secondary">
+              {member}
+            </Typography>
+          ))}
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
