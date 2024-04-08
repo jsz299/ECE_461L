@@ -47,14 +47,37 @@ def authenticateLogin(username, encryptedUserID, encryptedPassword):
 
 def createProjectDB(projectName, description, projectID, username):
     db = client.get_database("Projects")
-    collection = db[projectName]
+    # Iterate through all collections to check if projectID already exists
+    for collection_name in db.list_collection_names():
+        collection = db.get_collection(collection_name)
+        if collection.find_one({"projectID": projectID}):
+            return False  # Project ID already exists in some collection
+
+    # If project ID does not exist, create new collection and project document
+    newCollection = db[projectName]
     projectDocument = {
         "projectID": projectID,
         "description": description,
         "dateCreated": datetime.now(),
         "members": [username]
     }
-    collection.insert_one(projectDocument)
+    newCollection.insert_one(projectDocument)
+    return True  # Project created successfully
+
+
+def joinProjectDB(projectID, username):
+    db = client.get_database("Projects")
+    projectJoined = False
+    for collection_name in db.list_collection_names():
+        collection = db.get_collection(collection_name)
+        project = collection.find_one({"projectID": projectID})
+        if project:
+            # Check if username not already in members list to avoid duplication
+            if username not in project.get("members", []):
+                collection.update_one({"projectID": projectID}, {"$push": {"members": username}})
+                projectJoined = True
+                break
+    return projectJoined
 
 
 def getUserProjects(username):
@@ -72,3 +95,40 @@ def getUserProjects(username):
             })
     return user_projects
 
+
+def getHardwareResources():
+    db = client.get_database("Hardware")
+    hw_set1 = db["Hardware Set 1"].find_one({}, {'_id': 0, 'Available': 1, 'Capacity': 1})
+    hw_set2 = db["Hardware Set 2"].find_one({}, {'_id': 0, 'Available': 1, 'Capacity': 1})
+
+    hw_resources = {
+        "hwSet1": {
+            "available": hw_set1['Available'],
+            "capacity": hw_set1['Capacity']
+        },
+        "hwSet2": {
+            "available": hw_set2['Available'],
+            "capacity": hw_set2['Capacity']
+        }
+    }
+
+    return hw_resources
+
+
+def checkOut(hw_set, quantity):
+    print(hw_set)
+    print(quantity)
+    db = client.get_database("Hardware")
+    hw_collection = db[hw_set]
+    current_hw = hw_collection.find_one({}, {'Available': 1})
+    if int(current_hw['Available']) >= quantity:
+        hw_collection.update_one({}, {"$inc": {"Available": -quantity}})
+        return True
+    else:
+        return False
+
+
+def checkIn(hw_set, quantity):
+    db = client.get_database("Hardware")
+    hw_collection = db[hw_set]
+    hw_collection.update_one({}, {"$inc": {"Available": int(quantity)}})

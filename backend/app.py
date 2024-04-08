@@ -49,20 +49,6 @@ def login():
     return jsonify({"authentication": authentication})
 
 
-@app.route('/checkin_hardware/<projectId>/<int:qty>', methods=['POST'])
-def checkIn_hardware(projectId, qty):
-    # Logic to interact with the database would go here
-    # For now, we are just returning the projectId and quantity
-    return jsonify({"message": f"{qty} hardware checked in for project {projectId}"}), 200
-
-
-@app.route('/checkout_hardware/<projectId>/<int:qty>', methods=['POST'])
-def checkOut_hardware(projectId, qty):
-    # Logic to interact with the database would go here
-    # For now, we are just returning the projectId and quantity
-    return jsonify({"message": f"{qty} hardware checked out for project {projectId}"}), 200
-
-
 @app.route('/api/projects/<username>', methods=['GET'])
 def getProjects(username):
     projects = database.getUserProjects(username)
@@ -71,22 +57,28 @@ def getProjects(username):
 
 @app.route('/create_project', methods=['POST'])
 def createProject():
-    newProjectInfo = request.get_json()  # parse incoming json request data and return it
+    newProjectInfo = request.get_json()
+    projectName = newProjectInfo['name']
+    description = newProjectInfo['description']
+    projectID = newProjectInfo['projectID']
+    username = newProjectInfo['username']
 
-    projectName = newProjectInfo['name']  # get the name of the project
-    description = newProjectInfo['description']  # get the info about the project
-    projectID = newProjectInfo['projectID']  # get the project id
-    username = newProjectInfo['username']  # get the project id
-
-    database.createProjectDB(projectName, description, projectID, username)  #call db function
-    return jsonify({"message": f"created"}), 200
+    if database.createProjectDB(projectName, description, projectID, username):
+        return jsonify({"message": "Project created successfully"}), 201
+    else:
+        return jsonify({"message": "A project with the given ID already exists"}), 400
 
 
 @app.route('/join_project', methods=['POST'])
 def joinProject():
-    # Logic to verify user authorization would go here
-    # For now, we are just returning the projectId
-    return jsonify({"message": f"Joined project "}), 200
+    joinInfo = request.get_json()
+    projectID = joinInfo['projectId']
+    username = joinInfo['username']
+    if database.joinProjectDB(projectID, username):
+        return jsonify({"message": "Successfully joined the project"}), 200
+    else:
+        return jsonify(
+            {"message": "Failed to join the project. Project ID may not exist or user already a member."}), 400
 
 
 @app.route('/leave_project', methods=['POST'])
@@ -94,6 +86,35 @@ def leaveProject():
     # Logic to verify if user is part of the project would go here
     # For now, we are just returning the projectId
     return jsonify({"message": f"Left project"}), 200
+
+
+@app.route('/get_resources', methods=['GET'])
+def getResources():
+    try:
+        # Calls getHardwareResources and returns its value as JSON
+        resources = database.getHardwareResources()
+        return jsonify(resources), 200
+    except Exception as e:
+        print(f"Error retrieving resources: {e}")
+        return jsonify({"error": "An error occurred while retrieving resources."}), 500
+
+
+@app.route('/api/hardware/checkout/<hw_set>/<quantity>', methods=['POST'])
+def checkout_hardware(hw_set, quantity):
+    # Convert quantity to integer since URL parameters are passed as strings
+    quantity = int(quantity)
+    if database.checkOut(hw_set, quantity):
+        return jsonify({"message": "Checkout successful"}), 200
+    else:
+        return jsonify({"message": "Insufficient stock for checkout"}), 400
+
+
+@app.route('/api/hardware/checkin/<hw_set>/<quantity>', methods=['POST'])
+def checkin_hardware(hw_set, quantity):
+    # Convert quantity to integer
+    quantity = int(quantity)
+    database.checkIn(hw_set, quantity)
+    return jsonify({"message": "Check-in successful"}), 200
 
 
 if __name__ == '__main__':

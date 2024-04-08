@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Button, Typography, Box } from '@mui/material';
 
-const Project = ({ name, members, hwSet1, hwSet2, onJoinLeave }) => {
+const Project = ({ name, members, onJoinLeave }) => {
   const [joined, setJoined] = useState(false);
 
 
@@ -26,22 +26,22 @@ const Project = ({ name, members, hwSet1, hwSet2, onJoinLeave }) => {
           ))}
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-          <Typography variant="body2">
-            HWSet1: {hwSet1}
-          </Typography>
-          <Typography variant="body2">
-            HWSet2: {hwSet2}
-          </Typography>
-        </Box>
+        {/*<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>*/}
+        {/*  <Typography variant="body2">*/}
+        {/*    HWSet1: {hwSet1}*/}
+        {/*  </Typography>*/}
+        {/*  <Typography variant="body2">*/}
+        {/*    HWSet2: {hwSet2}*/}
+        {/*  </Typography>*/}
+        {/*</Box>*/}
 
-        <Button
-          variant="contained"
-          color={joined ? "secondary" : "primary"}
-          onClick={handleJoinLeave}
-        >
-          {joined ? "Leave" : "Join"}
-        </Button>
+        {/*<Button*/}
+        {/*  variant="contained"*/}
+        {/*  color={joined ? "secondary" : "primary"}*/}
+        {/*  onClick={handleJoinLeave}*/}
+        {/*>*/}
+        {/*  {joined ? "Leave" : "Join"}*/}
+        {/*</Button>*/}
       </CardContent>
     </Card>
   );
