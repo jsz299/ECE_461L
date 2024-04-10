@@ -6,7 +6,7 @@ import cipher
 import database
 
 # Static folder holds the built React app directory
-app = Flask(__name__, static_folder="../ReactFlaskServerSide/build", static_url_path="")
+app = Flask(__name__, static_folder="../build", static_url_path="")
 CORS(app)
 
 
