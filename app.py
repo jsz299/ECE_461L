@@ -1,12 +1,11 @@
-from flask import Flask, send_from_directory, request, json, render_template, jsonify
+from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 import os
-import json
 import cipher
 import database
 
 # Static folder holds the built React app directory
-app = Flask(__name__, static_folder="../build", static_url_path="")
+app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
 
