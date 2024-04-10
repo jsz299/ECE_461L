@@ -38,4 +38,3 @@ rich==13.4.2
 tqdm==4.64.1
 Werkzeug==3.0.1
 yarl==1.9.2
--e ./backend
