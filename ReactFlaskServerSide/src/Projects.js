@@ -119,18 +119,44 @@ const handleJoinProjectSubmit = async () => {
     setJoinOpen(false);
 };
 
-const handleLogout = () => {
-  localStorage.removeItem('username');
-  window.location.href = '/'; // Update '/login' to the path of your login page
-};
-
   return (
       <div style={{padding: 20}}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
               <Typography variant="h4">Projects</Typography>
               <div>
-                  <Button variant="outlined" onClick={handleClickOpen} style={{marginRight: 10}}>Create Project</Button>
-                  <Button variant="outlined" onClick={handleOpenJoinDialog}>Join Project</Button>
+                       <Button variant="outlined" onClick={handleClickOpen}>Create Project</Button>
+          <Dialog open={open} onClose={handleClose}>
+              <DialogTitle>Create a New Project</DialogTitle>
+              <DialogContent>
+                  <TextField autoFocus margin="dense" id="name" label="Project Name" type="text" fullWidth/>
+                  <TextField margin="dense" id="description" label="Description" type="text" fullWidth/>
+                  <TextField margin="dense" id="projectID" label="Project ID" type="text" fullWidth/>
+              </DialogContent>
+              <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button onClick={handleSubmitProject}>Submit</Button>
+              </DialogActions>
+          </Dialog>
+          <Button variant="outlined" onClick={handleOpenJoinDialog}>Join Project</Button>
+          <Dialog open={joinOpen} onClose={handleCloseJoinDialog}>
+              <DialogTitle>Join a Project</DialogTitle>
+              <DialogContent>
+                  <TextField
+                      autoFocus
+                      margin="dense"
+                      id="joinProjectId"
+                      label="Project ID"
+                      type="text"
+                      fullWidth
+                      value={projectIdToJoin}
+                      onChange={(e) => setProjectIdToJoin(e.target.value)}
+                  />
+              </DialogContent>
+              <DialogActions>
+                  <Button onClick={handleCloseJoinDialog}>Cancel</Button>
+                  <Button onClick={handleJoinProjectSubmit}>Join</Button>
+              </DialogActions>
+          </Dialog>
               </div>
           </div>
           <div style={{
@@ -149,9 +175,6 @@ const handleLogout = () => {
               ))}
           </div>
           <ResourceManagement/> {/* Use the Resource Management component */}
-          <Button variant="contained" color="secondary" onClick={handleLogout} style={{ marginTop: '20px' }}>
-          LOGOUT
-        </Button>
       </div>
   );
 };
